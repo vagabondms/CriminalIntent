@@ -24,6 +24,7 @@ class CrimeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) Called")
+        crime = Crime()
     }
 
     override fun onCreateView(
