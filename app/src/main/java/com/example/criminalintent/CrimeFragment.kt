@@ -12,7 +12,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 
-const val TAG: String = "CrimeFragment"
+private const val TAG: String = "CrimeFragment"
 
 class CrimeFragment : Fragment() {
 
@@ -91,5 +91,11 @@ class CrimeFragment : Fragment() {
         super.onDestroy()
 
         Log.d(TAG, "onDestroy")
+    }
+
+    companion object {
+        fun newInstance(): CrimeFragment {
+            return CrimeFragment()
+        }
     }
 }
