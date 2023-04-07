@@ -1,11 +1,14 @@
 package com.example.criminalintent
 
+
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -56,15 +59,21 @@ class CrimeListFragment : Fragment() {
 
         private val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
         private val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
+        private val solvedImageView: ImageView = itemView.findViewById(R.id.crime_solved)
 
         init {
             itemView.setOnClickListener(this)
         }
 
-        fun bind(crime: Crime){
+        fun bind(crime: Crime) {
             this.crime = crime
             titleTextView.text = this.crime.title
-            dateTextView.text = this.crime.date.toString()
+            dateTextView.text = DateFormat.format("E, MMM, d, yyyy",this.crime.date)
+
+            solvedImageView.visibility = when (crime.isSolved) {
+                true -> View.VISIBLE
+                else -> View.GONE
+            }
         }
 
         override fun onClick(v: View?) {
