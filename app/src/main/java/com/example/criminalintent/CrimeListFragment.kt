@@ -11,13 +11,13 @@ import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import java.util.UUID
+import java.util.*
 
 private const val TAG = "CrimeListFragment"
 
@@ -30,7 +30,7 @@ class CrimeListFragment : Fragment() {
     private var callbacks: Callbacks? = null
 
     private lateinit var crimeRecyclerView: RecyclerView
-    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+    private var adapter: CrimeAdapter = CrimeAdapter(emptyList())
 
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProvider(this).get(CrimeListViewModel::class.java)
@@ -58,12 +58,11 @@ class CrimeListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        crimeListViewModel.crimeListLiveData.observe(viewLifecycleOwner) { crimes ->
-            crimes?.let {
-                Log.i(TAG, "Got crimes ${crimes.size}")
-                updateUI(crimes)
-            }
+        crimeListViewModel.crimeListLiveData.observe(viewLifecycleOwner) {
+            /// ListAdapter 웨안뒈?
+            crimeRecyclerView.adapter = CrimeAdapter(it)
         }
+
     }
 
     override fun onDetach() {
@@ -71,10 +70,6 @@ class CrimeListFragment : Fragment() {
         callbacks = null
     }
 
-    private fun updateUI(crimes: List<Crime>) {
-        adapter = CrimeAdapter(crimes)
-        crimeRecyclerView.adapter = adapter
-    }
 
     private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
 
@@ -105,7 +100,7 @@ class CrimeListFragment : Fragment() {
     }
 
     private inner class CrimeAdapter(var crimes: List<Crime>) :
-        RecyclerView.Adapter<CrimeHolder>() {
+        ListAdapter<Crime,CrimeHolder>(diffUtil) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
             val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
             Log.d("CRIME_LIST_FRAGMENT", "onCreateViewHolder Called")
@@ -124,6 +119,18 @@ class CrimeListFragment : Fragment() {
     }
 
     companion object {
+
+        val diffUtil = object : DiffUtil.ItemCallback<Crime>() {
+            override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+                Log.d("HI",oldItem.toString())
+                return oldItem == newItem
+            }
+
+            override fun areContentsTheSame(oldItem: Crime, newItem: Crime): Boolean {
+                return oldItem.id == newItem.id
+            }
+        }
+
         fun newInstance(): CrimeListFragment {
             return CrimeListFragment()
         }
