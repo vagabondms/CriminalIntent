@@ -58,11 +58,11 @@ class CrimeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         crimeDetailViewModel.crimeLiveData.observe(
             viewLifecycleOwner
-        ) {
-            crime -> crime?.let {
+        ) { crime ->
+            crime?.let {
                 this.crime = crime
-            updateUI()
-        }
+                updateUI()
+            }
         }
     }
 
@@ -72,9 +72,11 @@ class CrimeFragment : Fragment() {
 
         val titleWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                crime.title = s.toString()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -90,7 +92,7 @@ class CrimeFragment : Fragment() {
 
     }
 
-    private fun updateUI(){
+    private fun updateUI() {
         titleField.setText(crime.title)
         dateButton.text = crime.date.toString()
         solvedCheckBox.isChecked = crime.isSolved
@@ -109,7 +111,7 @@ class CrimeFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-
+        crimeDetailViewModel.saveCrime(crime)
         Log.d(TAG, "onStop")
     }
 
