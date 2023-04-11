@@ -3,6 +3,7 @@ package com.example.criminalintent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ private const val TAG: String = "CrimeFragment"
 private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_DATE = 0
+private const val DATE_FORMAT = "yyyy년 M월 d일 H시 m분, E요일"
 
 class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
 
@@ -100,6 +102,29 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         titleField.setText(crime.title)
         dateButton.text = crime.date.toString()
         solvedCheckBox.isChecked = crime.isSolved
+    }
+
+    private fun getCrimeReport(): String {
+        val solvedString = if (crime.isSolved) {
+            getString(R.string.crime_report_solved)
+        } else {
+            getString(R.string.crime_report_solved)
+        }
+
+        val dateString = DateFormat.format(DATE_FORMAT, crime.date).toString()
+        var suspect = if (crime.suspect.isBlank()) {
+            getString(R.string.crime_report_suspect)
+        } else {
+            getString(R.string.crime_report_suspect, crime.suspect)
+        }
+
+        return getString(
+            R.string.crime_report,
+            crime.title,
+            dateString,
+            solvedString,
+            crime.suspect
+        )
     }
 
     override fun onResume() {
