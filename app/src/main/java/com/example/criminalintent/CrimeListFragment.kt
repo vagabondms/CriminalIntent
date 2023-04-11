@@ -5,10 +5,8 @@ import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.view.View.OnClickListener
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -42,6 +40,11 @@ class CrimeListFragment : Fragment() {
         callbacks = context as Callbacks?
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,6 +73,10 @@ class CrimeListFragment : Fragment() {
         callbacks = null
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
 
     private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view), OnClickListener {
 
@@ -100,7 +107,7 @@ class CrimeListFragment : Fragment() {
     }
 
     private inner class CrimeAdapter(var crimes: List<Crime>) :
-        ListAdapter<Crime,CrimeHolder>(diffUtil) {
+        ListAdapter<Crime, CrimeHolder>(diffUtil) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
             val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
             Log.d("CRIME_LIST_FRAGMENT", "onCreateViewHolder Called")
@@ -122,7 +129,7 @@ class CrimeListFragment : Fragment() {
 
         val diffUtil = object : DiffUtil.ItemCallback<Crime>() {
             override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
-                Log.d("HI",oldItem.toString())
+                Log.d("HI", oldItem.toString())
                 return oldItem == newItem
             }
 
