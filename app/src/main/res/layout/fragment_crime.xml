@@ -43,4 +43,16 @@
 
         />
 
+    <Button
+        android:id="@+id/select_suspect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_suspect"/>
+
+    <Button
+        android:id="@+id/send_report"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/crime_suspect_text"/>
+
 </LinearLayout>

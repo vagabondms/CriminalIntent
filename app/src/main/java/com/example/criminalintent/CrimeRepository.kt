@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.example.criminalintent.database.CrimeDataBase
+import com.example.criminalintent.database.migration_1_2
 import java.util.UUID
 import java.util.concurrent.Executors
 
@@ -12,7 +13,7 @@ private const val DATABASE_NAME = "crime-database"
 class CrimeRepository private constructor(context: Context) {
 
     private val database: CrimeDataBase =
-        Room.databaseBuilder(context.applicationContext, CrimeDataBase::class.java, DATABASE_NAME)
+        Room.databaseBuilder(context.applicationContext, CrimeDataBase::class.java, DATABASE_NAME).addMigrations(migration_1_2)
             .build()
 
     private val crimeDao = database.crimeDao()
