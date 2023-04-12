@@ -1,6 +1,10 @@
 package com.example.criminalintent
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
@@ -19,7 +23,9 @@ private const val TAG: String = "CrimeFragment"
 private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_DATE = 0
+private const val REQUEST_CONTACT = 1
 private const val DATE_FORMAT = "yyyy년 M월 d일 H시 m분, E요일"
+
 
 class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
 
@@ -27,6 +33,11 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
     private lateinit var solvedCheckBox: CheckBox
+    private lateinit var reportButton: Button
+    private lateinit var suspectButton: Button
+
+
+
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
     }
@@ -47,6 +58,8 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         titleField = view.findViewById(R.id.crime_title)
         dateButton = view.findViewById(R.id.crime_date)
         solvedCheckBox = view.findViewById(R.id.crime_solved)
+        reportButton = view.findViewById(R.id.send_report)
+        suspectButton = view.findViewById(R.id.crime_suspect)
 
         Log.d(TAG, "onCreateView")
 
@@ -96,12 +109,68 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
             }
         }
 
+        reportButton.setOnClickListener {
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plan"
+                putExtra(Intent.EXTRA_TEXT, getCrimeReport())
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
+            }.also { intent ->
+                val chooserIntent = Intent.createChooser(intent, getString(R.string.send_report))
+                startActivity(chooserIntent)
+            }
+        }
+
+        suspectButton.apply {
+            val pickContactIntent =
+                Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+            setOnClickListener {
+                startActivityForResult(pickContactIntent, REQUEST_CONTACT)
+            }
+            val resolvedActivity = pickContactIntent.resolveActivity(requireActivity().packageManager)
+            if (resolvedActivity == null) {
+                isEnabled = false
+            }
+        }
     }
 
     private fun updateUI() {
         titleField.setText(crime.title)
         dateButton.text = crime.date.toString()
         solvedCheckBox.isChecked = crime.isSolved
+
+        if (crime.suspect.isNotEmpty()) {
+            suspectButton.text = crime.suspect
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        when {
+            resultCode != Activity.RESULT_OK -> return
+
+            requestCode == REQUEST_CONTACT && data != null -> {
+                val contactUri: Uri = data.data ?: return
+                val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+                val cursor = requireActivity().contentResolver.query(
+                    contactUri,
+                    queryFields,
+                    null,
+                    null,
+                    null
+                )
+                cursor?.use {
+                    if (it.count == 0) {
+                        return
+                    }
+                    it.moveToFirst()
+                    val suspect = it.getString(0)
+                    crime.suspect = suspect
+                    crimeDetailViewModel.saveCrime(crime)
+                    suspectButton.text = suspect
+                }
+            }
+        }
+
     }
 
     private fun getCrimeReport(): String {
@@ -112,7 +181,7 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         }
 
         val dateString = DateFormat.format(DATE_FORMAT, crime.date).toString()
-        var suspect = if (crime.suspect.isBlank()) {
+        val suspect = if (crime.suspect.isBlank()) {
             getString(R.string.crime_report_suspect)
         } else {
             getString(R.string.crime_report_suspect, crime.suspect)
@@ -123,7 +192,7 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
             crime.title,
             dateString,
             solvedString,
-            crime.suspect
+            suspect
         )
     }
 

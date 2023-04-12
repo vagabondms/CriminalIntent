@@ -44,15 +44,15 @@
         />
 
     <Button
-        android:id="@+id/select_suspect"
-        android:layout_width="wrap_content"
+        android:id="@+id/crime_suspect"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/crime_suspect_text"/>
 
     <Button
         android:id="@+id/send_report"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/crime_suspect_text"/>
+        android:text="@string/send_report"/>
 
 </LinearLayout>
